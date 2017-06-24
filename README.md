@@ -1,4 +1,4 @@
-# safetalk
+# Safe Talk
 
 End to end talk encryption, defend against censorship
 
@@ -16,8 +16,10 @@ End to end talk encryption, defend against censorship
 
 4. Write your message in the program, and then Ctrl+V to chat window
 
+5. Copy his message, and decrypted message will be shown in the program (started as $)
+
 ![](useless/3.jpg)
 
-5. Copy his message, and decrypted message will be shown in the program
+## Effect
 
 ![](useless/4.jpg)
