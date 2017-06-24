@@ -1,6 +1,9 @@
 """
-TODO: fix too long message Overflow
+SafeTalk
+End to end talk encryption, automatically read and clipboard
+Using pure python rsa module, so the message cannot be too long
 
+Author: zjuchenyuan
 """
 
 import rsa
