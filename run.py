@@ -16,7 +16,8 @@ import os
 from time import sleep
 from storage import storage_save, storage_get
 from myclipboard import clipboard_write, clipboard_read
-__all__ = ['generate_key', 'show_mypubkey']
+
+__all__ = ['generate_key', 'show_mypubkey', 'decrypt_hismessage', 'encrypt_mymessage']
 
 
 def b64(data):
@@ -113,40 +114,57 @@ def thread_decrypt(mypriv=None):
             oldmessage = message
             show_message(message)
 
+def get_user_input():
+    try:
+        result = input("! Input your message: ")
+    except EOFError:
+        os._exit(0)
+    return result
+
 def main():
     hispub = None
+    """
+    try to receive his key from clipboard before write my pubkey to clipboard
+    """
     tmp = receive_hispubkey("")
     if tmp:
         hispub = tmp[1]
         flag = False
     else:
         flag = True
-    mypub,mypriv = generate_key()
+    mypub,mypriv = generate_key() # my pubkey is writed to clipboard
     print("! Waiting for copy his key...")
     while flag:
         sleep(0.5)
-        tmp = receive_hispubkey(mypub)
+        tmp = receive_hispubkey(mypub) #receive_hispubkey returns (True, hispub) or False
         flag = not tmp
     if hispub is None:
         hispub = tmp[1]
     print("* his key received, start chat now")
+    """
+    key exchange finished, start decryption thread
+    """
     print("* Try send this to him: "+encrypt_mymessage("hello world!", hispub))
     t = threading.Thread(target=thread_decrypt,args=[mypriv])
     t.start()
-    try:
-        while 1:
-            userinput = input("! Input your message: ")
+    """
+    read input from user, write crypto to clipboard
+    """
+    while 1:
+        try:
+            userinput = get_user_input()
             try:
                 message = encrypt_mymessage(userinput, hispub)
             except OverflowError:
                 clipboard_write("[error]too long message", show=False)
             else:
                 clipboard_write(message)
-    except:
-        traceback.print_exc()
-        os._exit(0)
-    finally:
-        os._exit(0)
+        except KeyboardInterrupt:
+            os._exit(0)
+        except:
+            traceback.print_exc()
+            continue
+    os._exit(0)
     
 
 if __name__ == "__main__":
